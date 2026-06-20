@@ -77,9 +77,8 @@
 ;;Tests: (sqrt2 2 1 0.0001) → 1 169/408
 (define sqrt2
   (lambda (x init epsilon)
-   find-first(sqrt-lzl(x, init) (lambda(head (sqrt-lzl(x, init)))(< head epsilon)))
-  )
-)
+    (head (find-first (sqrt-lzl x init) 
+                     (lambda (pair) (< (tail pair) epsilon))))))
 
 ;;;; Q2
 
@@ -87,11 +86,14 @@
 ;;Purpose: Find the value of 'key'. If 'key' is not found return �fail.
 ;;Type: [List<Pair(Symbol,T)>*Symbol -> T | 'fail)
 ;;Tests: (get-value '((a . 3) (b . 4)) 'b) --> 4,(get-value '((a . 3) (b . 4)) 'c) --> 'fail
-(define get-value
+(define get-value$
   (lambda (assoc-list key)
-   @TODO
-  )
-)
+    (if (empty? assoc-list)
+        'fail
+        (if (equal? (car (car assoc-list)) key)
+            (cdr (car assoc-list))
+            (get-value$ (cdr assoc-list) key)))))
+
 
 ;;Signature: get-value$(assoc-list, key, success, fail)
 ;;Purpose: Find the value of 'key'. If 'key' is found, then apply the continuation 'success' on its value val. Otherwise, apply the continuation 'fail'.
@@ -99,9 +101,14 @@
 ;;Tests: > (get-value$ '((a . 3) (b . 4)) 'b (lambda(x) (* x x )) (lambda()#f)) --> 16, (get-value$ '((a . 3) (b . 4)) 'c (lambda(x) (* x x)) (lambda()#f)) --> #f
 (define get-value$
   (lambda (assoc-list key success fail)
-   @TODO
+   (if (empty? assoc-list)
+        (fail)
+        (if (equal? (car (car assoc-list)) key)
+            (success(cdr (car assoc-list)))
+            (get-value$ (cdr assoc-list) key success fail)))
   )
 )
+
 
 ;;Signature: collect-all-values(list-assoc-lists, key)
 ;;Purpose: Returns a list of all values of the first occurrence of 'key' in each of the given association lists. If no such value, returns the empty list.
@@ -111,17 +118,24 @@
 ;;(define l2 '((e . 5) (f . 6)))
 ;;(collect-all-values (list l1 l2) 'e) --> '(2 5)
 ;;(collect-all-values (list l1 l2) 'k)--> '()
-
 (define collect-all-values-1
- (lambda (lists key)
-  @TODO
- )
-)
+  (lambda (lists key) 
+    (if (empty? lists)
+        '()
+        (if (equal? (get-value (car lists) key) 'fail)
+            (collect-all-values-1 (cdr lists) key)
+            (cons (get-value (car lists) key) 
+                  (collect-all-values-1 (cdr lists) key))))))
+
+   
 
 (define collect-all-values-2
- (lambda (lists key)
-  @TODO
- )
-)
-   
-   
+  (lambda (lists key)
+    (if (empty? lists)
+        '()
+        (get-value$ (car lists) 
+                    key 
+                    (lambda (val) 
+                      (cons val (collect-all-values-2 (cdr lists) key)))
+                    (lambda () 
+                      (collect-all-values-2 (cdr lists) key))))))
