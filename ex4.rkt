@@ -53,9 +53,8 @@
 ;;Tests: (take (sqrt-lzl 2 1) 3) →  '((1 . 1) (3/2 . 1/4) (17/12 . 1/144)) 
 (define sqrt-lzl 
   (lambda (x init)
-   @TODO
-  )
-)  
+    (cons-lzl (cons init (abs (- (square init) x))) 
+              (lambda () (sqrt-lzl x (improve init x))))))
 
 ;;Signature: find-first(lzlst, p)
 ;;Purpose: Return the first item in the given lazy list which satisfies the given predicate. If no such item exists return 'fail.
@@ -65,9 +64,11 @@
 
 (define find-first
   (lambda (lz-lst p)
-   @TODO
-  )
-)
+    (if (empty-lzl? lz-lst)
+        'fail
+        (if (p (head lz-lst))
+            (head lz-lst)
+            (find-first (tail lz-lst) p)))))
 
 ;;Signature: sqrt2(x,init,epsilon)
 ;;Purpose: return approximation of the square root of the given number x, according to Newton method, starting from init guess with epsilon threshold.  The procedure uses sqrt-lzl and find-first procedures.
@@ -76,10 +77,9 @@
 ;;Tests: (sqrt2 2 1 0.0001) → 1 169/408
 (define sqrt2
   (lambda (x init epsilon)
-   @TODO
+   find-first(sqrt-lzl(x, init) (lambda(head (sqrt-lzl(x, init)))(< head epsilon)))
   )
 )
-
 
 ;;;; Q2
 
