@@ -78,7 +78,7 @@
 (define sqrt2
   (lambda (x init epsilon)
     (head (find-first (sqrt-lzl x init) 
-                     (lambda (pair) (< (tail pair) epsilon))))))
+                     (lambda (pair) (< (cdr pair) epsilon))))))
 
 ;;;; Q2
 
@@ -86,13 +86,13 @@
 ;;Purpose: Find the value of 'key'. If 'key' is not found return �fail.
 ;;Type: [List<Pair(Symbol,T)>*Symbol -> T | 'fail)
 ;;Tests: (get-value '((a . 3) (b . 4)) 'b) --> 4,(get-value '((a . 3) (b . 4)) 'c) --> 'fail
-(define get-value$
+(define get-value
   (lambda (assoc-list key)
     (if (empty? assoc-list)
         'fail
         (if (equal? (car (car assoc-list)) key)
             (cdr (car assoc-list))
-            (get-value$ (cdr assoc-list) key)))))
+            (get-value (cdr assoc-list) key)))))
 
 
 ;;Signature: get-value$(assoc-list, key, success, fail)
